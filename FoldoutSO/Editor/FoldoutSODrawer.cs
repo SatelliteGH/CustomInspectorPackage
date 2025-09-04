@@ -4,7 +4,7 @@ using UnityEngine;
 namespace CustomInspector
 {
     [CustomPropertyDrawer(typeof(ScriptableObject), true)]
-    public class ScriptableObjectDrawer : PropertyDrawer
+    public class FoldoutSODrawer : PropertyDrawer
     {
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
@@ -23,7 +23,22 @@ namespace CustomInspector
                 property.isExpanded = EditorGUI.Foldout(foldoutRect, property.isExpanded, GUIContent.none);
             }
 
-            property.objectReferenceValue = EditorGUI.ObjectField(objectRect, property.objectReferenceValue, fieldInfo.FieldType, false);
+            Type objType;
+
+            if (fieldInfo.FieldType.IsArray)
+            {
+                objType = fieldInfo.FieldType.GetElementType();
+            }
+            else if (fieldInfo.FieldType.IsGenericType && fieldInfo.FieldType.GetGenericTypeDefinition() == typeof(List<>))
+            {
+                objType = fieldInfo.FieldType.GetGenericArguments()[0];
+            }
+            else
+            {
+                objType = fieldInfo.FieldType;
+            }
+
+            property.objectReferenceValue = EditorGUI.ObjectField(objectRect, property.objectReferenceValue, objType, false);
 
             if (property.objectReferenceValue == null || !property.isExpanded)
                 return;
