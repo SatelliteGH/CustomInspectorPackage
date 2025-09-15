@@ -23,13 +23,13 @@ namespace CustomInspector
                 property.isExpanded = EditorGUI.Foldout(foldoutRect, property.isExpanded, GUIContent.none);
             }
 
-            Type objType;
+            System.Type objType;
 
             if (fieldInfo.FieldType.IsArray)
             {
                 objType = fieldInfo.FieldType.GetElementType();
             }
-            else if (fieldInfo.FieldType.IsGenericType && fieldInfo.FieldType.GetGenericTypeDefinition() == typeof(List<>))
+            else if (fieldInfo.FieldType.IsGenericType && fieldInfo.FieldType.GetGenericTypeDefinition() == typeof(System.Collections.Generic.List<>))
             {
                 objType = fieldInfo.FieldType.GetGenericArguments()[0];
             }
