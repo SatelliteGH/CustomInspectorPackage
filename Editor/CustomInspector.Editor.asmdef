@@ -1,8 +1,8 @@
 {
-    "name": "ReadonlyEditor",
+    "name": "CustomInspector.Editor",
     "rootNamespace": "",
     "references": [
-        "GUID:33c5d3e0ba032a2409c93532049dcdc5"
+        "GUID:a449419ff5141514c8c624f72741c75c"
     ],
     "includePlatforms": [
         "Editor"

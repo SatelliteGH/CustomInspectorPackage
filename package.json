@@ -1,6 +1,6 @@
 {
-  "name": "com.rabsuiragh.custominspector",
-  "version": "1.1.1",
+  "name": "com.satellitegh.custominspector",
+  "version": "1.1.2",
   "displayName": "Custom Inspector",
   "description": "Some features for inspector",
   "unity": "2020.1",
