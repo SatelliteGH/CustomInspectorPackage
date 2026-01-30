@@ -10,8 +10,9 @@ namespace CustomInspector
     public class PolyFieldDrawer : PropertyDrawer
     {
         private static readonly Dictionary<Type, Dictionary<string, Type>> Cache = new();
-
-
+        private bool _isEditorWindow = false;
+        private static float _menuPadding = 18f;
+        private static float _buttonPadding = 15f;
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
             PolyFieldAttribute attr = (PolyFieldAttribute)attribute;
@@ -23,30 +24,39 @@ namespace CustomInspector
                 Cache[baseType] = typeMap;
             }
 
+            if (EditorWindow.mouseOverWindow != null && EditorWindow.mouseOverWindow.GetType().Name == "InspectorWindow")
+            {
+                _isEditorWindow = false;
+            }
+            else if (EditorWindow.mouseOverWindow != null && typeof(EditorWindow).IsAssignableFrom(EditorWindow.mouseOverWindow.GetType()))
+            {
+                _isEditorWindow = true;
+            }
+
+            Rect main = position;
+
             EditorGUI.BeginProperty(position, label, property);
 
-            Rect labelRect;
-            if (attr.CollectionItem)
-            {
-                labelRect = new Rect(position.x, position.y, position.width, EditorGUIUtility.singleLineHeight);
-            }
-            else
-            {
-                Rect lineRect = new(position.x, position.y, position.width, EditorGUIUtility.singleLineHeight);
-                labelRect = new Rect(lineRect.x + EditorGUIUtility.labelWidth, lineRect.y,
-                                     lineRect.width - EditorGUIUtility.labelWidth, lineRect.height);
 
-                EditorGUI.LabelField(lineRect, label);
+            if (!attr.CollectionItem)
+            {
+                Rect labelRect = new Rect(main.x, main.y, EditorGUIUtility.labelWidth, main.height);
+                main = new Rect(labelRect.x + EditorGUIUtility.labelWidth, main.y,
+                                main.width - EditorGUIUtility.labelWidth, main.height);
+
+                EditorGUI.LabelField(labelRect, label);
             }
 
 
             string currentTypeName = property.managedReferenceFullTypename;
             string displayName = GetShortTypeName(currentTypeName) ?? "Select Type";
 
+            Rect buttonRect = new Rect(main.x + _buttonPadding, main.y, main.width - _menuPadding - _buttonPadding, EditorGUIUtility.singleLineHeight);
+
 
             GUIContent typeContent = new($"{displayName}");
 
-            if (EditorGUI.DropdownButton(labelRect, typeContent, FocusType.Keyboard))
+            if (EditorGUI.DropdownButton(buttonRect, typeContent, FocusType.Keyboard))
             {
                 GenericMenu menu = new GenericMenu();
 
@@ -64,12 +74,36 @@ namespace CustomInspector
                 menu.ShowAsContext();
             }
 
+            float inspectorPadding = _isEditorWindow ? 0 : 15f;
+            Rect foldoutRect = new Rect(main.x + inspectorPadding, main.y, 14, EditorGUIUtility.singleLineHeight);
+
             if (property.managedReferenceValue != null)
             {
-                Rect bodyRect = new(position.x, position.y, position.width, position.height);
+                property.isExpanded = EditorGUI.Foldout(foldoutRect, property.isExpanded, GUIContent.none, true);
+            }
 
+            if (property.isExpanded && property.managedReferenceValue != null)
+            {
+                EditorGUI.indentLevel++;
 
-                EditorGUI.PropertyField(bodyRect, property, GUIContent.none, true);
+                SerializedProperty child = property.Copy();
+                SerializedProperty end = child.GetEndProperty();
+
+                float y = main.y + EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
+                bool enterChildren = true;
+
+                while (child.NextVisible(enterChildren) && !SerializedProperty.EqualContents(child, end))
+                {
+                    float height = EditorGUI.GetPropertyHeight(child, true);
+                    Rect childRect = new Rect(main.x, y, main.width, height);
+
+                    EditorGUI.PropertyField(childRect, child, true);            
+
+                    y += height + EditorGUIUtility.standardVerticalSpacing;
+                    enterChildren = false;
+                }
+
+                EditorGUI.indentLevel--;
             }
 
             EditorGUI.EndProperty();
