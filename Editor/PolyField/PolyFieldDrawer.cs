@@ -11,7 +11,6 @@ namespace CustomInspector
     {
         private static readonly Dictionary<Type, Dictionary<string, Type>> Cache = new();
         private bool _isEditorWindow = false;
-        private static float _menuPadding = 18f;
         private static float _buttonPadding = 15f;
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
@@ -40,8 +39,8 @@ namespace CustomInspector
 
             if (!attr.CollectionItem)
             {
-                Rect labelRect = new Rect(main.x, main.y, EditorGUIUtility.labelWidth, main.height);
-                main = new Rect(labelRect.x + EditorGUIUtility.labelWidth, main.y,
+                Rect labelRect = new Rect(main.x, main.y, EditorGUIUtility.labelWidth, EditorGUIUtility.singleLineHeight);
+                main = new Rect(main.x + EditorGUIUtility.labelWidth, main.y,
                                 main.width - EditorGUIUtility.labelWidth, main.height);
 
                 EditorGUI.LabelField(labelRect, label);
@@ -51,7 +50,7 @@ namespace CustomInspector
             string currentTypeName = property.managedReferenceFullTypename;
             string displayName = GetShortTypeName(currentTypeName) ?? "Select Type";
 
-            Rect buttonRect = new Rect(main.x + _buttonPadding, main.y, main.width - _menuPadding - _buttonPadding, EditorGUIUtility.singleLineHeight);
+            Rect buttonRect = new Rect(main.x + _buttonPadding, main.y, main.width - _buttonPadding, EditorGUIUtility.singleLineHeight);
 
 
             GUIContent typeContent = new($"{displayName}");
@@ -74,8 +73,17 @@ namespace CustomInspector
                 menu.ShowAsContext();
             }
 
-            float inspectorPadding = _isEditorWindow ? 0 : 15f;
-            Rect foldoutRect = new Rect(main.x + inspectorPadding, main.y, 14, EditorGUIUtility.singleLineHeight);
+            float inspectorPadding;
+            if(_isEditorWindow)
+            {
+                inspectorPadding = attr.CollectionItem ? 0 : -14f;
+            }
+            else
+            {
+                inspectorPadding = attr.CollectionItem ? 14 : 0;
+            }
+
+            Rect foldoutRect = new Rect(main.x + inspectorPadding, main.y, 28, EditorGUIUtility.singleLineHeight);
 
             if (property.managedReferenceValue != null)
             {
