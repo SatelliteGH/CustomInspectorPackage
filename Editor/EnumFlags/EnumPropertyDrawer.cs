@@ -1,38 +1,43 @@
-[CustomPropertyDrawer(typeof(Enum), true)]
-public sealed class EnumPropertyDrawer : PropertyDrawer
-{
-    public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
-    {
-        using (new EditorGUI.PropertyScope(position, label, property))
-        {
-            if (HasEnumFlagsAttribute())
-            {
-                var intValue = EditorGUI.MaskField(position, label, property.intValue, property.enumDisplayNames);
+using System;
+using UnityEditor;
+using UnityEngine;
 
-                if (property.intValue != intValue)
+namespace CustomInspector.Editor
+{
+    [CustomPropertyDrawer(typeof(Enum), true)]
+    public sealed class EnumPropertyDrawer : PropertyDrawer
+    {
+        public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
+        {
+            using (new EditorGUI.PropertyScope(position, label, property))
+            {
+                if (HasEnumFlagsAttribute())
                 {
-                    property.intValue = intValue;
+                    int intValue = EditorGUI.MaskField(position, label, property.intValue, property.enumDisplayNames);
+
+                    if (property.intValue != intValue)
+                    {
+                        property.intValue = intValue;
+                    }
+                }
+                else
+                {
+                    EditorGUI.PropertyField(position, property, label);
                 }
             }
-            else
+
+            return;
+
+            bool HasEnumFlagsAttribute()
             {
-                EditorGUI.PropertyField(position, property, label);
+                Type fieldType = fieldInfo.FieldType;
+
+                if (!fieldType.IsArray) return fieldType.IsDefined(typeof(FlagsAttribute), false);
+
+                Type elementType = fieldType.GetElementType();
+
+                return elementType != null && elementType.IsDefined(typeof(FlagsAttribute), false);
             }
-        }
-
-        bool HasEnumFlagsAttribute()
-        {
-            var fieldType = fieldInfo.FieldType;
-
-            if (fieldType.IsArray)
-            {
-                var elementType = fieldType.GetElementType();
-
-                return elementType.IsDefined(typeof(FlagsAttribute), false);
-            }
-
-            return fieldType.IsDefined(typeof(FlagsAttribute), false);
-
         }
     }
 }
