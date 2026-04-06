@@ -12,7 +12,7 @@ namespace CustomInspector.Editor
 {
     public class CreateScriptableObjectWindow : EditorWindow
     {
-        private const string MENU_PATH = "Assets/Create Scriptable Object";
+        private const string MENU_PATH = "Assets/Create Scriptable Object 2";
         private const int MENU_PRIORITY = -9999;
 
         private static List<Type> _cachedTypes;
@@ -25,7 +25,7 @@ namespace CustomInspector.Editor
         private string _searchFilter = "";
 
         private TreeViewState<int> _treeViewState;
-        private ScriptableObjectTypeTreeView _treeView;
+        private UniversalTreeView<Type> _treeView;
 
         private string _lastSearch;
         private int _lastCount;
@@ -80,7 +80,11 @@ namespace CustomInspector.Editor
 
             if (_treeView == null)
             {
-                _treeView = new ScriptableObjectTypeTreeView(_treeViewState);
+                _treeView = new UniversalTreeView<Type>(_treeViewState,
+                                                      t => t.Name,
+                                                      t => t.Namespace,
+                                                      t => t.FullName
+                                                     );
             }
         }
 

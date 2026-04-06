@@ -4,7 +4,7 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 
-namespace CustomInspector
+namespace CustomInspector.Editor
 {
     [CustomPropertyDrawer(typeof(PolyFieldAttribute))]
     public class PolyFieldDrawer : PropertyDrawer
@@ -12,6 +12,8 @@ namespace CustomInspector
         private static readonly Dictionary<Type, Dictionary<string, Type>> Cache = new();
         private bool _isEditorWindow = false;
         private static float _buttonPadding = 15f;
+
+
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
             PolyFieldAttribute attr = (PolyFieldAttribute)attribute;
@@ -57,24 +59,22 @@ namespace CustomInspector
 
             if (EditorGUI.DropdownButton(buttonRect, typeContent, FocusType.Keyboard))
             {
-                GenericMenu menu = new GenericMenu();
+                List<Type> types = typeMap.Select(x => x.Value).ToList();
 
-                foreach ((string name, Type type) in typeMap)
-                {
-                    menu.AddItem(new GUIContent(name),
-                                 type.FullName == currentTypeName,
-                                 () =>
-                                 {
-                                     property.managedReferenceValue = Activator.CreateInstance(type);
-                                     property.serializedObject.ApplyModifiedProperties();
-                                 });
-                }
-
-                menu.ShowAsContext();
+                UniversalPickerWindow<Type>.Show(buttonRect,
+                                                 types,
+                                                 type =>
+                                                 {
+                                                     property.managedReferenceValue = Activator.CreateInstance(type);
+                                                     property.serializedObject.ApplyModifiedProperties();
+                                                 },
+                                                 t => t.Name,
+                                                 t => t.Namespace,
+                                                 t => t.FullName);
             }
 
             float inspectorPadding;
-            if(_isEditorWindow)
+            if (_isEditorWindow)
             {
                 inspectorPadding = attr.CollectionItem ? 0 : -14f;
             }
@@ -105,7 +105,7 @@ namespace CustomInspector
                     float height = EditorGUI.GetPropertyHeight(child, true);
                     Rect childRect = new Rect(main.x, y, main.width, height);
 
-                    EditorGUI.PropertyField(childRect, child, true);            
+                    EditorGUI.PropertyField(childRect, child, true);
 
                     y += height + EditorGUIUtility.standardVerticalSpacing;
                     enterChildren = false;
