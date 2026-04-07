@@ -22,25 +22,34 @@ namespace CustomInspector.Editor
                 typeList = BuildTypeMap(baseType);
                 Cache[baseType] = typeList;
             }
-
+            Rect main = position;       
 
             EditorGUI.BeginProperty(position, label, property);
+
+            if (!attr.CollectionItem)
+            {
+                Rect labelRect = new Rect(main.x, main.y, EditorGUIUtility.labelWidth, EditorGUIUtility.singleLineHeight);
+                main = new Rect(main.x + EditorGUIUtility.labelWidth, main.y,
+                                main.width - EditorGUIUtility.labelWidth, main.height);
+
+                EditorGUI.LabelField(labelRect, label);
+            }
 
             string currentTypeName = property.stringValue;
 
             Rect buttonRect;
             if (string.IsNullOrEmpty(currentTypeName))
             {
-                buttonRect = new Rect(position.x, position.y, position.width, EditorGUIUtility.singleLineHeight);
+                buttonRect = new Rect(main.x, main.y, main.width, EditorGUIUtility.singleLineHeight);
             }
             else
             {
-                Rect rect = new Rect(position.x, position.y, position.width * 0.8f, EditorGUIUtility.singleLineHeight);
+                Rect rect = new Rect(main.x, main.y, main.width * 0.8f, EditorGUIUtility.singleLineHeight);
                 bool isHovered = rect.Contains(Event.current.mousePosition);
 
 
                 EditorGUI.SelectableLabel(rect, isHovered ? currentTypeName : currentTypeName[(currentTypeName.LastIndexOf('.') + 1)..]);
-                buttonRect = new Rect(position.x + position.width * 0.8f, position.y, position.width * 0.2f, EditorGUIUtility.singleLineHeight);
+                buttonRect = new Rect(main.x + main.width * 0.8f, main.y, main.width * 0.2f, EditorGUIUtility.singleLineHeight);
             }
 
             GUIContent typeContent = new GUIContent("Select");
