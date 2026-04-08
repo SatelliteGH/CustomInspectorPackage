@@ -47,8 +47,14 @@ namespace CustomInspector.Editor
                 Rect rect = new Rect(main.x, main.y, main.width * 0.8f, EditorGUIUtility.singleLineHeight);
                 bool isHovered = rect.Contains(Event.current.mousePosition);
 
+                GUIContent tooltipContent = new GUIContent(GUIContent.none)
+                {
+                    tooltip = currentTypeName
+                };
+                EditorGUI.LabelField(rect, tooltipContent);
 
-                EditorGUI.SelectableLabel(rect, isHovered ? currentTypeName : currentTypeName[(currentTypeName.LastIndexOf('.') + 1)..]);
+                string shortName = currentTypeName.Contains(',') ? currentTypeName.Substring(0, currentTypeName.IndexOf(',')) : currentTypeName;
+                EditorGUI.SelectableLabel(rect, isHovered ? shortName : shortName[(shortName.LastIndexOf('.') + 1)..]);
                 buttonRect = new Rect(main.x + main.width * 0.8f, main.y, main.width * 0.2f, EditorGUIUtility.singleLineHeight);
             }
 
@@ -61,7 +67,7 @@ namespace CustomInspector.Editor
                                                  typeList,
                                                  type =>
                                                  {
-                                                     property.stringValue = type.FullName;
+                                                     property.stringValue = type.AssemblyQualifiedName;
                                                      property.serializedObject.ApplyModifiedProperties();
                                                  },
                                                  t => t.Name,
