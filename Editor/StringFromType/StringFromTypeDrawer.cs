@@ -82,19 +82,8 @@ namespace CustomInspector.Editor
 
         private List<Type> BuildTypeMap(Type baseType)
         {
-            return AppDomain.CurrentDomain.GetAssemblies()
-                            .SelectMany(a =>
-                             {
-                                 try
-                                 {
-                                     return a.GetTypes();
-                                 }
-                                 catch
-                                 {
-                                     return Type.EmptyTypes;
-                                 }
-                             })
-                            .Where(t => !t.IsAbstract && !t.IsGenericType && baseType.IsAssignableFrom(t))
+            return TypeCache.GetTypesDerivedFrom(baseType)
+                            .Where(t => !t.IsAbstract && !t.IsGenericType)
                             .OrderBy(t => t.FullName)
                             .ToList();
         }
