@@ -26,8 +26,10 @@ namespace CustomInspector.Editor
                                      Action<T> onSelect,
                                      Func<T, string> getName,
                                      Func<T, string> getGroup,
-                                     Func<T, string> getSearch)
+                                     Func<T, string> getSearch,
+                                     bool showNamesOnly = false)
         {
+            _showNamesOnly = showNamesOnly;
             _items = items;
             _onSelect = onSelect;
             _getName = getName;
@@ -41,6 +43,7 @@ namespace CustomInspector.Editor
                                              _getSearch
                                             );
 
+            _tree.ShowNamesOnly = _showNamesOnly;
             _tree.OnEnter += SelectAndClose;
             _tree.OnDoubleClick += SelectAndClose;
             _tree.SetData(_items, "");
@@ -53,9 +56,10 @@ namespace CustomInspector.Editor
                                 Action<T> onSelect,
                                 Func<T, string> getName,
                                 Func<T, string> getGroup,
-                                Func<T, string> getSearch)
+                                Func<T, string> getSearch,
+                                bool showNamesOnly = false)
         {
-            PopupWindow.Show(buttonRect, new UniversalPickerWindow<T>(items, onSelect, getName, getGroup, getSearch));
+            PopupWindow.Show(buttonRect, new UniversalPickerWindow<T>(items, onSelect, getName, getGroup, getSearch, showNamesOnly));
         }
 
 

@@ -70,7 +70,8 @@ namespace CustomInspector.Editor
                                                  },
                                                  t => t.Name,
                                                  t => t.Namespace,
-                                                 t => t.FullName);
+                                                 t => t.FullName,
+                                                 true);
             }
 
             float inspectorPadding;
