@@ -136,22 +136,8 @@ namespace CustomInspector.Editor
 
         static Dictionary<string, Type> BuildTypeMap(Type baseType)
         {
-            return AppDomain.CurrentDomain.GetAssemblies()
-                            .SelectMany(a =>
-                             {
-                                 try
-                                 {
-                                     return a.GetTypes();
-                                 }
-                                 catch
-                                 {
-                                     return Type.EmptyTypes;
-                                 }
-                             })
-                            .Where(t =>
-                                       !t.IsAbstract &&
-                                       !t.IsGenericType &&
-                                       baseType.IsAssignableFrom(t))
+            return TypeCache.GetTypesDerivedFrom(baseType)
+                            .Where(t => !t.IsAbstract)
                             .ToDictionary(
                                           t => ObjectNames.NicifyVariableName(t.Name),
                                           t => t
