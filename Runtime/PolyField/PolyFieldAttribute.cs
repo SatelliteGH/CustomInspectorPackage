@@ -7,12 +7,13 @@ namespace CustomInspector
     {
         public readonly Type BaseType;
         public readonly bool CollectionItem;
+        public readonly bool Readonly;
 
-
-        public PolyFieldAttribute(Type baseType, bool collectionItem)
+        public PolyFieldAttribute(Type baseType, bool collectionItem, bool makeRadonly = false)
         {
             BaseType = baseType;
             CollectionItem = collectionItem;
+            Readonly = makeRadonly;
         }
     }
 }

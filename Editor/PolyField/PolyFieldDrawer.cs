@@ -57,6 +57,7 @@ namespace CustomInspector.Editor
 
             GUIContent typeContent = new($"{displayName}");
 
+            EditorGUI.BeginDisabledGroup(attr.Readonly);
             if (EditorGUI.DropdownButton(buttonRect, typeContent, FocusType.Keyboard))
             {
                 List<Type> types = typeMap.Select(x => x.Value).ToList();
@@ -73,6 +74,7 @@ namespace CustomInspector.Editor
                                                  t => t.FullName,
                                                  true);
             }
+            EditorGUI.EndDisabledGroup();
 
             float inspectorPadding;
             if (_isEditorWindow)
